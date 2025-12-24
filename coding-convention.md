@@ -23,11 +23,5 @@ Mọi API phải trả về định dạng JSON thông qua `ApiResponseTrait`:
 - Thành công: `{ "status": "success", "message": "...", "data": [...] }`
 - Thất bại: `{ "status": "error", "message": "...", "data": null }`
 
-## 4. Frontend (React)
-- **Components**: Chia nhỏ thành các component chức năng trong `src/components`.
-- **Common Components**: Các thành phần dùng lại (Button, Input, Loading) đặt trong `src/components/common`.
-- **Styling**: Sử dụng CSS variables đã định nghĩa trong `index.css`.
-- **API Call**: Sử dụng Axios và xử lý loading state bằng `LoadingButton`.
-
 ---
 *Lưu ý: Dev phải đọc file này trước khi thực hiện bất kỳ thay đổi nào về code.*
