@@ -7,6 +7,8 @@ use App\Repositories\Interfaces\IUserRepository;
 use App\Repositories\UserRepository;
 use App\Services\Interfaces\IUserService;
 use App\Services\UserService;
+use App\Services\Interfaces\IAuthService;
+use App\Services\AuthService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Bind Services
         $this->app->bind(IUserService::class, UserService::class);
+        $this->app->bind(IAuthService::class, AuthService::class);
     }
 
     /**

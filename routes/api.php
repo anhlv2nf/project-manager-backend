@@ -1,16 +1,30 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\AuthController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::apiResource('users', UserController::class);
+// Public routes
+Route::post('/login', [AuthController::class, 'login']);
 
+// Protected routes
+Route::middleware('auth:sanctum')->group(function () {
+    // Auth actions
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
+
+    // User management (Protected)
+    Route::apiResource('users', UserController::class);
+});
+
+// Test route
 Route::get('/test', function () {
     return response()->json(['message' => 'Hello from Laravel API!']);
 });
