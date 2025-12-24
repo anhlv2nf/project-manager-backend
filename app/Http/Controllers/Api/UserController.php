@@ -3,80 +3,65 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
+use App\Services\Interfaces\IUserService;
+use App\Traits\ApiResponseTrait;
+use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
-    public function index()
+    use ApiResponseTrait;
+
+    protected IUserService $userService;
+
+    public function __construct(IUserService $userService)
     {
-        return response()->json(User::all());
+        $this->userService = $userService;
     }
 
-    public function store(Request $request)
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'phone_number' => 'nullable|string|max:20',
-            'role' => 'required|in:admin,manager,member',
-            'status' => 'required|in:active,inactive',
-            'password' => 'required|string|min:8',
-        ]);
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone_number' => $validated['phone_number'],
-            'role' => $validated['role'],
-            'status' => $validated['status'],
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        return response()->json($user, 201);
+        $users = $this->userService->getAllUsers();
+        return $this->successResponse($users, 'Users retrieved successfully');
     }
 
-    public function show(string $id)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreUserRequest $request): JsonResponse
     {
-        return response()->json(User::findOrFail($id));
+        $user = $this->userService->createUser($request->validated());
+        return $this->successResponse($user, 'User created successfully', 201);
     }
 
-    public function update(Request $request, string $id)
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id): JsonResponse
     {
-        $user = User::findOrFail($id);
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id,
-            'phone_number' => 'nullable|string|max:20',
-            'role' => 'required|in:admin,manager,member',
-            'status' => 'required|in:active,inactive',
-            'password' => 'nullable|string|min:8',
-        ]);
-
-        $data = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone_number' => $validated['phone_number'],
-            'role' => $validated['role'],
-            'status' => $validated['status'],
-        ];
-
-        if (!empty($validated['password'])) {
-            $data['password'] = Hash::make($validated['password']);
-        }
-
-        $user->update($data);
-
-        return response()->json($user);
+        $user = $this->userService->getUserById((int)$id);
+        return $this->successResponse($user);
     }
 
-    public function destroy(string $id)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateUserRequest $request, string $id): JsonResponse
     {
-        $user = User::findOrFail($id);
-        $user->delete();
+        $user = $this->userService->updateUser((int)$id, $request->validated());
+        return $this->successResponse($user, 'User updated successfully');
+    }
 
-        return response()->json(['message' => 'User deleted successfully']);
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        $this->userService->deleteUser((int)$id);
+        return $this->successResponse(null, 'User deleted successfully');
     }
 }
