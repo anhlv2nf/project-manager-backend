@@ -49,4 +49,21 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    /**
+     * Projects managed by this user (as PM)
+     */
+    public function projectsManaged()
+    {
+        return $this->hasMany(Project::class, 'pm_id');
+    }
+
+    /**
+     * Projects joined by this user as a member
+     */
+    public function projectsJoined()
+    {
+        return $this->belongsToMany(Project::class, 'project_user')
+                    ->withPivot('role_in_project')
+                    ->withTimestamps();
+    }
 }
