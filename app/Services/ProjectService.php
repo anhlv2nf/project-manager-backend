@@ -19,13 +19,12 @@ class ProjectService implements IProjectService
 
     public function getAllProjects(): Collection
     {
-        // Load relationships to avoid N+1
-        return Project::with(['pm', 'members'])->get();
+        return Project::with(['managers', 'members'])->get();
     }
 
     public function getProjectById(int $id): Project
     {
-        return Project::with(['pm', 'members'])->findOrFail($id);
+        return Project::with(['managers', 'members'])->findOrFail($id);
     }
 
     public function createProject(array $data): Project
@@ -33,11 +32,11 @@ class ProjectService implements IProjectService
         return DB::transaction(function () use ($data) {
             $project = $this->projectRepository->create($data);
             
-            if (isset($data['members']) && is_array($data['members'])) {
-                $this->projectRepository->syncMembers($project->id, $data['members']);
+            if (isset($data['users']) && is_array($data['users'])) {
+                $this->projectRepository->syncUsersWithRoles($project->id, $data['users']);
             }
             
-            return $project->load(['pm', 'members']);
+            return $project->load(['managers', 'members']);
         });
     }
 
@@ -46,16 +45,24 @@ class ProjectService implements IProjectService
         return DB::transaction(function () use ($id, $data) {
             $project = $this->projectRepository->update($id, $data);
             
-            if (isset($data['members']) && is_array($data['members'])) {
-                $this->projectRepository->syncMembers($id, $data['members']);
+            if (isset($data['users']) && is_array($data['users'])) {
+                $this->projectRepository->syncUsersWithRoles($id, $data['users']);
             }
             
-            return $project->load(['pm', 'members']);
+            return $project->load(['managers', 'members']);
         });
     }
 
     public function deleteProject(int $id): bool
     {
         return $this->projectRepository->delete($id);
+    }
+
+    public function syncUsers(int $id, array $usersWithRoles): Project
+    {
+        return DB::transaction(function () use ($id, $usersWithRoles) {
+            $this->projectRepository->syncUsersWithRoles($id, $usersWithRoles);
+            return $this->getProjectById($id);
+        });
     }
 }

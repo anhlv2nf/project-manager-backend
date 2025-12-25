@@ -12,4 +12,5 @@ interface IProjectService
     public function createProject(array $data): Project;
     public function updateProject(int $id, array $data): Project;
     public function deleteProject(int $id): bool;
+    public function syncUsers(int $id, array $usersWithRoles): Project;
 }

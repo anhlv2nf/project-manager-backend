@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
+use App\Http\Requests\Project\SyncProjectUsersRequest;
 use App\Services\Interfaces\IProjectService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
@@ -48,5 +49,16 @@ class ProjectController extends Controller
     {
         $this->projectService->deleteProject((int)$id);
         return $this->successResponse(null, 'Xóa dự án thành công');
+    }
+
+    public function syncUsers(SyncProjectUsersRequest $request, string $id): JsonResponse
+    {
+        $users = [];
+        foreach ($request->users as $item) {
+            $users[$item['user_id']] = ['role_in_project' => $item['role_in_project']];
+        }
+
+        $project = $this->projectService->syncUsers((int)$id, $users);
+        return $this->successResponse($project, 'Cập nhật thành viên dự án thành công');
     }
 }

@@ -15,4 +15,12 @@ class ProjectConstant
         self::STATUS_COMPLETED,
         self::STATUS_ON_HOLD,
     ];
+
+    const ROLE_MANAGER = 'manager';
+    const ROLE_MEMBER = 'member';
+
+    const ROLES = [
+        self::ROLE_MANAGER,
+        self::ROLE_MEMBER,
+    ];
 }

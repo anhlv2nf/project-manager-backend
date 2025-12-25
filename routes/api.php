@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/change-password', [AuthController::class, 'changePassword']);
 
     // Resource routes
+    Route::post('/projects/{project}/users', [ProjectController::class, 'syncUsers']);
     Route::apiResource('projects', ProjectController::class);
     Route::apiResource('users', UserController::class);
 });

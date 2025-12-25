@@ -12,9 +12,10 @@ class ProjectRepository extends BaseRepository implements IProjectRepository
         parent::__construct($model);
     }
 
-    public function syncMembers(int $projectId, array $memberIds): void
+    public function syncUsersWithRoles(int $projectId, array $usersWithRoles): void
     {
+        // $usersWithRoles example: [1 => ['role_in_project' => 'manager'], 2 => ['role_in_project' => 'member']]
         $project = $this->find($projectId);
-        $project->members()->sync($memberIds);
+        $project->users()->sync($usersWithRoles);
     }
 }

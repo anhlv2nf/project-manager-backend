@@ -4,5 +4,5 @@ namespace App\Repositories\Interfaces;
 
 interface IProjectRepository extends IBaseRepository
 {
-    public function syncMembers(int $projectId, array $memberIds): void;
+    public function syncUsersWithRoles(int $projectId, array $usersWithRoles): void;
 }
